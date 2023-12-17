@@ -56,4 +56,29 @@
 *  }
 * }
 * ```
+*
+* Inter region VPC peering works too, route all subnets across peering connection
+* ```
+* module "vpc_peering_deluxe_inter_region" {
+*  source  = "JudeQuintana/vpc-peering-deluxe/aws"
+*  version = "1.0.0"
+*
+*  providers = {
+*    aws.local = aws.usw2
+*    aws.peer  = aws.usw2
+*  }
+*
+*  env_prefix         = var.env_prefix
+*  vpc_peering_deluxe = {
+*    local = {
+*      vpc = module.vpc_usw2
+*    }
+*    peer = {
+*      vpc = module.vpc_usw2
+*    }
+*  }
+* }
+* ```
+*
+*
 */
