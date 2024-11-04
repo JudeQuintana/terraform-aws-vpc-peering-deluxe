@@ -6,6 +6,18 @@ Can be used in tandem with Centralized Router, Super Router and Full Mesh Trio f
 
 See it in action in [Full Mesh Trio Demo](https://github.com/JudeQuintana/terraform-main/tree/main/full_mesh_trio_demo)
 
+`v1.0.1`
+- ipv6 routes for VPC ipv6 subnet cidrs
+- moar validation
+```
+module "vpc_peering_deluxe" {
+ source  = "JudeQuintana/vpc-peering-deluxe/aws"
+ version = "1.0.1"
+...
+```
+
+`v1.0.0`
+- ipv4 routes for VPC ipv4 subnet cidrs
 ```
 module "vpc_peering_deluxe" {
  source  = "JudeQuintana/vpc-peering-deluxe/aws"
@@ -84,14 +96,14 @@ module "vpc_peering_deluxe_inter_region" {
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >=1.3 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >=4.20 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >=5.61 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws.local"></a> [aws.local](#provider\_aws.local) | >=4.20 |
-| <a name="provider_aws.peer"></a> [aws.peer](#provider\_aws.peer) | >=4.20 |
+| <a name="provider_aws.local"></a> [aws.local](#provider\_aws.local) | >=5.61 |
+| <a name="provider_aws.peer"></a> [aws.peer](#provider\_aws.peer) | >=5.61 |
 
 ## Modules
 
@@ -101,6 +113,8 @@ No modules.
 
 | Name | Type |
 |------|------|
+| [aws_route.this_ipv6_local_to_this_peer](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
+| [aws_route.this_ipv6_peer_to_this_local](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
 | [aws_route.this_local_to_this_peer](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
 | [aws_route.this_peer_to_this_local](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
 | [aws_vpc_peering_connection.this_local_to_this_peer](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_peering_connection) | resource |
@@ -118,7 +132,7 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_env_prefix"></a> [env\_prefix](#input\_env\_prefix) | prod, stage, test | `string` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Addtional Tags | `map(string)` | `{}` | no |
-| <a name="input_vpc_peering_deluxe"></a> [vpc\_peering\_deluxe](#input\_vpc\_peering\_deluxe) | VPC Peering Deluxe configuration. Will create appropriate routes for all subnets in each VPC by default unless specific subnet cidrs are selected to route across the VPC peering connection via only\_route\_subnet\_cidrs list is populated. | <pre>object({<br>    allow_remote_vpc_dns_resolution = optional(bool, false)<br>    local = object({<br>      vpc = object({<br>        account_id              = string<br>        full_name               = string<br>        id                      = string<br>        name                    = string<br>        network_cidr            = string<br>        private_subnet_cidrs    = list(string)<br>        public_subnet_cidrs     = list(string)<br>        private_route_table_ids = list(string)<br>        public_route_table_ids  = list(string)<br>        region                  = string<br>      })<br>      only_route_subnet_cidrs = optional(list(string), [])<br>    })<br>    peer = object({<br>      vpc = object({<br>        account_id              = string<br>        full_name               = string<br>        id                      = string<br>        name                    = string<br>        network_cidr            = string<br>        private_subnet_cidrs    = list(string)<br>        public_subnet_cidrs     = list(string)<br>        private_route_table_ids = list(string)<br>        public_route_table_ids  = list(string)<br>        region                  = string<br>      })<br>      only_route_subnet_cidrs = optional(list(string), [])<br>    })<br>  })</pre> | n/a | yes |
+| <a name="input_vpc_peering_deluxe"></a> [vpc\_peering\_deluxe](#input\_vpc\_peering\_deluxe) | VPC Peering Deluxe configuration. Will create appropriate routes for all subnets in each VPC by default unless specific subnet cidrs are selected to route across the VPC peering connection via only\_route.subnet\_cidrs list is populated. | <pre>object({<br/>    allow_remote_vpc_dns_resolution = optional(bool, false)<br/>    local = object({<br/>      vpc = object({<br/>        account_id                = string<br/>        full_name                 = string<br/>        id                        = string<br/>        name                      = string<br/>        network_cidr              = string<br/>        ipv6_network_cidr         = optional(string)<br/>        private_subnet_cidrs      = list(string)<br/>        public_subnet_cidrs       = list(string)<br/>        private_ipv6_subnet_cidrs = optional(list(string), [])<br/>        public_ipv6_subnet_cidrs  = optional(list(string), [])<br/>        private_route_table_ids   = list(string)<br/>        public_route_table_ids    = list(string)<br/>        region                    = string<br/>      })<br/>      only_route = optional(object({<br/>        subnet_cidrs      = optional(list(string), [])<br/>        ipv6_subnet_cidrs = optional(list(string), [])<br/>      }), {})<br/>    })<br/>    peer = object({<br/>      vpc = object({<br/>        account_id                = string<br/>        full_name                 = string<br/>        id                        = string<br/>        name                      = string<br/>        network_cidr              = string<br/>        ipv6_network_cidr         = optional(string)<br/>        private_subnet_cidrs      = list(string)<br/>        public_subnet_cidrs       = list(string)<br/>        private_ipv6_subnet_cidrs = list(string)<br/>        public_ipv6_subnet_cidrs  = list(string)<br/>        private_route_table_ids   = list(string)<br/>        public_route_table_ids    = list(string)<br/>        region                    = string<br/>      })<br/>      only_route = optional(object({<br/>        subnet_cidrs      = optional(list(string), [])<br/>        ipv6_subnet_cidrs = optional(list(string), [])<br/>      }), {})<br/>    })<br/>  })</pre> | n/a | yes |
 
 ## Outputs
 
